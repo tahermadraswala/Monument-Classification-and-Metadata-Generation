@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import axios from 'axios';
 import './App.css';
 
 function App() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [description, setDescription] = useState('');
   const [metadata, setMetadata] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleUpload = (e) => {
     const file = e.target.files[0];
@@ -14,15 +17,46 @@ function App() {
     }
   };
 
-  const handleSubmit = () => {
-    // Simulate backend response
-    setMetadata({
-      monument: "Gateway of India",
-      type: "Colonial Arch",
-      location: "Mumbai, India",
-      style: "Indo-Saracenic",
-      period: "Early 20th Century"
-    });
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
+  };
+
+  const handleSubmit = async () => {
+    if (!description.trim()) {
+      alert("Please enter a description for metadata generation.");
+      return;
+    }
+    if (!imageFile) {
+      alert("Please upload an image file.");
+      return;
+    }
+
+    setLoading(true);
+    setMetadata(null); // Clear previous metadata
+    try {
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('description', description);
+
+      const response = await axios.post('http://localhost:8000/generate_metadata/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const result = response.data?.metadata;
+
+      if (result) {
+        setMetadata(result);
+      } else {
+        alert("Unexpected response from backend.");
+      }
+    } catch (error) {
+      console.error("Error fetching metadata:", error);
+      alert("Failed to fetch metadata from backend.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const downloadMetadata = () => {
@@ -38,7 +72,7 @@ function App() {
   return (
     <div className="container">
       <h1>Monument Classification and Metadata Generation</h1>
-      <p>Upload a monument photo & discover its story!</p>
+      <p>Upload a monument photo & enter a short description to generate metadata.</p>
 
       <label className="upload-btn">
         <input type="file" onChange={handleUpload} accept="image/*" hidden />
@@ -51,19 +85,31 @@ function App() {
         </div>
       )}
 
-      {imageFile && (
-        <button className="submit-btn" onClick={handleSubmit}>Submit</button>
-      )}
+      <textarea
+        placeholder="Enter a short description of the monument..."
+        value={description}
+        onChange={handleDescriptionChange}
+        rows={4}
+        className="description-box"
+      />
+
+      <button
+        className="submit-btn"
+        onClick={handleSubmit}
+        disabled={loading || !imageFile || !description.trim()}
+      >
+        {loading ? 'Generating...' : 'Submit'}
+      </button>
 
       {metadata && (
         <div className="result-box">
           <h2>Result</h2>
-          <p><strong>Monument:</strong> {metadata.monument}</p>
-          <p><strong>Type:</strong> {metadata.type}</p>
-          <p><strong>Location:</strong> {metadata.location}</p>
-          <p><strong>Style:</strong> {metadata.style}</p>
-          <p><strong>Period:</strong> {metadata.period}</p>
-          <button className="download-btn" onClick={downloadMetadata}>⬇ Download Metadata</button>
+          <pre style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }}>
+            {metadata}
+          </pre>
+          <button className="download-btn" onClick={downloadMetadata}>
+            ⬇ Download Metadata
+          </button>
         </div>
       )}
     </div>

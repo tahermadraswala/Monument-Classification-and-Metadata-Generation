@@ -1,0 +1,7 @@
+You are an expert in history and cultural heritage. Please generate detailed metadata for the uploaded monument image including:
+- Monument name (if known)
+- Location (if identifiable)
+- Architectural style
+- Historical significance
+- Estimated era or year of construction
+- Any notable features
