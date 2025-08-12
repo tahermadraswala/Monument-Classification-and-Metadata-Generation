@@ -6,7 +6,7 @@ import base64
 import os
 
 # Set your Google Gemini API key directly here
-GOOGLE_API_KEY = "AIzaSyDc7Bcdp7STEuH11HCQhF3cHzNNjM-sD3w"
+GOOGLE_API_KEY = "your API KEY Here"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 model = genai.GenerativeModel('gemini-1.5-flash-latest')
