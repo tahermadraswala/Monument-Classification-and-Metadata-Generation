@@ -1,71 +1,158 @@
-# Getting Started with Create React App
+# Monument Classification and Metadata Generation
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Project Overview
 
-## Available Scripts
+Monument Classification and Metadata Generation is a full-stack web application that automates the identification of monuments in images and generates rich metadata about them. The system leverages generative AI for intelligent annotation and aims to provide accessible monument information for researchers, educators, and cultural heritage enthusiasts.
 
-In the project directory, you can run:
+The repository is built using a modern stack:  
+- **Frontend**: React (JavaScript), styled with CSS, enhanced with a visually engaging and responsive interface.  
+- **Backend**: FastAPI (Python), integrates Google Gemini (Generative AI) for metadata generation.
 
-### `npm start`
+**Language breakdown:**  
+- HTML: 41.5%  
+- JavaScript: 31.9%  
+- Python: 16.4%  
+- CSS: 10.2%  
 
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Repository Structure
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
+Monument-Classification-and-Metadata-Generation/
+├── backend/
+│   ├── .gitignore
+│   ├── gemini_utils.py
+│   ├── main.py
+│   ├── prompt_templates.txt
+│   └── requirements.txt
+├── public/
+│   ├── index.html
+│   ├── manifest.json
+│   ├── robots.txt
+├── src/
+│   ├── App.css
+│   ├── App.js
+│   ├── App.test.js
+│   ├── index.css
+│   ├── index.js
+│   ├── reportWebVitals.js
+│   └── setupTests.js
+├── .gitignore
+├── package.json
+└── package-lock.json
+```
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Technology Stack
 
-### `npm run build`
+| Layer      | Technology                           | Key Features                                                   |
+|------------|--------------------------------------|---------------------------------------------------------------|
+| Frontend   | React, JavaScript, HTML, CSS         | Responsive UI, drag-and-drop image upload, dark mode support  |
+| Backend    | FastAPI (Python), Google Gemini API  | RESTful API, generative monument metadata, CORS support       |
+| Utilities  | Pillow, python-dotenv, Axios         | Image preprocessing, environment management, HTTP requests    |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Core Functionality
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 1. Monument Image Upload & Preview
 
-### `npm run eject`
+- Users can easily upload monument images via drag-and-drop or file selector.
+- The interface provides instant image previews and supports dark/light mode toggling.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 2. Metadata Prompt & Generation (AI-driven)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- The user provides a brief description along with the image.
+- The backend combines user input and image with a carefully crafted prompt:
+    ```
+    You are an expert in history and cultural heritage. Please generate detailed metadata for the uploaded monument image including:
+    - Monument name (if known)
+    - Location (if identifiable)
+    - Architectural style
+    - Historical significance
+    - Estimated era or year of construction
+    - Any notable features
+    ```
+- The metadata is generated using Google Gemini's generative AI capabilities (`gemini_utils.py`).
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 3. REST API (FastAPI, Python)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- **`POST /generate_metadata/`**: Accepts an image file and description; responds with annotated metadata and error handling.
+- Integrated robust CORS middleware for frontend/backend communication (outside localhost scenario possible).
 
-## Learn More
+### 4. Downloadable Results
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- Users can download generated metadata in JSON format for further processing or archiving.
+- Results are shown as prettified JSON for easy review.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## Setup & Installation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Backend Setup:
 
-### Analyzing the Bundle Size
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+# Create a .env file for Google Gemini API key if needed, or set key in gemini_utils.py
+uvicorn main:app --reload
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Frontend Setup:
 
-### Making a Progressive Web App
+```bash
+npm install
+npm start
+```
+- **Frontend** runs on `localhost:3000`  
+- **Backend API** defaults to `localhost:8000`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## Usage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. Open the frontend and upload a monument photo.
+2. Enter a short description of the monument (optional but recommended for better results).
+3. Submit and review the detailed metadata returned by the AI.
+4. Download metadata as JSON for external use.
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Detailed File/Component Overview
 
-### `npm run build` fails to minify
+### `src/App.js`  
+- Orchestrates the user workflow: file upload, preview, description input, POST request to backend, shows metadata, supports download.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### `backend/main.py`
+- Defines REST endpoints, handles file reception and encoding, error handling, and interacts with Gemini-powered metadata generator.
+
+### `backend/gemini_utils.py`
+- Encapsulates Gemini API calls, loads images, sends prompt (uses strong domain-specific template), and returns AI-generated metadata.
+
+### `public/index.html`  
+- Custom theme, drag-and-drop UX, demonstration cards, dark mode toggle (UI/UX polish).
+
+### Prompt Customization:  
+- Edit `backend/prompt_templates.txt` to refine or adjust metadata requirements as the AI prompt for best domain results.
+
+---
+
+## Testing
+
+- Frontend basic test coverage with React Testing Library (`src/App.test.js`)
+- Extend backend tests (not included currently) for endpoints and error handling.
+
+---
+
+## Extensibility & Customization
+
+- **Prompt templates** are easy to edit for new domains or metadata fields.
+- Gemini integration can be switched out to other generative AI providers.
+- Frontend and backend modular for new features—multi-image, user accounts, advanced result handling, etc.
+
+---
+
